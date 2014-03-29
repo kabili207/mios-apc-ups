@@ -1,0 +1,317 @@
+<?xml version="1.0"?>
+<implementation>
+  <settings>
+    <protocol>cr</protocol>
+  </settings>
+  <functions>
+    -- $Id$
+    --
+    -- Device Implementation file to retrieve generic temperature data.
+    --
+    local http = require("socket.http")
+    -- 5 Second timeout
+    http.TIMEOUT = 5
+
+    local UPS_SERVICE = "urn:upnp-zyrenth-com:serviceId:Ups1"
+	local HADEVICE_SERVICE = "urn:micasaverde-com:serviceId:HaDevice1"
+    local ENERGY_METERING_SERVICE = "urn:micasaverde-com:serviceId:EnergyMetering1"
+
+    local MSG_CLASS = "ApcUps"
+
+    local DEBUG_MODE = true
+    local taskHandle = -1
+
+    local TASK_ERROR = 2
+    local TASK_ERROR_PERM = -2
+    local TASK_SUCCESS = 4
+    local TASK_BUSY = 1
+
+	local initialized = false
+	
+    local function log(text, level)
+        luup.log(string.format("%s: %s", MSG_CLASS, text), (level or 50))
+    end
+
+    local function debug(text)
+        if (DEBUG_MODE == true) then
+            log("debug: " .. text, 35)
+        end
+    end
+
+	local function lines(str)
+		local t = {}
+		local function helper(line) table.insert(t, line) return "" end
+		helper((str:gsub("(.-)\r?\n", helper)))
+		return t
+	end
+	
+	local function round(num, idp)
+		local mult = 10^(idp or 0)
+		return math.floor(num * mult + 0.5) / mult
+	end
+	
+    local function task(text, mode)
+        luup.log("task " .. text)
+        if (mode == TASK_ERROR_PERM) then
+            taskHandle = luup.task(text, TASK_ERROR, MSG_CLASS, taskHandle)
+        else
+            taskHandle = luup.task(text, mode, MSG_CLASS, taskHandle)
+
+            -- Clear the previous error, since they're all transient
+            if (mode ~= TASK_SUCCESS) then
+                luup.call_delay("clearTask", 30, "", false)
+            end
+        end
+    end
+
+    --
+    -- Has to be "non-local" in order for MiOS to call it :(
+    --
+    function clearTask()
+        task("Clearing...", TASK_SUCCESS)
+    end
+
+    local function setIfChanged(serviceId, name, value, deviceId, default)
+        local curValue = luup.variable_get(serviceId, name, deviceId)
+
+        if ((value ~= curValue) or (curValue == nil)) then
+            luup.variable_set(serviceId, name, value, deviceId)
+            return true
+        else
+            return (default or false)
+        end
+    end
+
+    --- Find the named Child device of [this] Device.
+    --
+    -- This function will enumerate the Master/Global list of devices in Vera and
+    -- locate the "named" Child device.  It's used all over to locate the Children.
+    --
+    --   "Why haven't you checked the children"  :)
+    --
+    -- This would make an awfully handy convenience method on a Device object... hint, hint.
+    --
+    local function findChild(parentDevice, label)
+        for k, v in pairs(luup.devices) do
+            if (v.device_num_parent == parentDevice
+                and v.id == label) then
+                return k
+            end
+        end
+
+        -- Dump a copy of the Global Module list for debugging purposes.
+        log("findChild cannot find parentDevice: " .. tostring(parentDevice) .. " label: " .. label)
+        for k, v in pairs(luup.devices) do
+            log("Device Number: " .. k ..
+                " v.device_type: " .. tostring(v.device_type) ..
+                " v.device_num_parent: " .. tostring(v.device_num_parent) ..
+                " v.id: " .. tostring(v.id)
+            )
+        end
+    end
+
+    local function fetchSensorData(url)
+        local st = os.time()
+        --
+        -- And some test code that call's the URL.
+        --
+        debug("fetchSensorData called")
+
+        local data, status
+
+        debug("fetchSensorData: " .. url)
+
+        data, status = http.request(url)
+
+        debug("fetchSensorData: Successful execution of URL data=" .. data)
+
+        
+		data = data:match("&lt;pre>(.+)&lt;/pre>")
+		local tabl = lines(data)
+		local stats = {}
+
+		for i,v in pairs(tabl) do
+			if(v ~= "") then
+				local kk = v:match("^(.-)%s*:")
+				local vv = v:match("^.-:%s*(.-)%s*$")
+				stats[kk] = vv
+			end
+		end
+
+        debug("fetchSensorData: exec=" .. (os.time() - st))
+
+        if (stats == nil) then
+            return false,
+                   string.format("Unable to parse result for url=%s, data=%s", url, (data or "no result"))
+        else
+            return true, stats
+        end
+    end
+
+    function refreshCache()
+        --
+        -- And some test code that call's WUI's [unofficial] Weather API/URL/
+        --
+        -- Many thanks to the recommendations of both @LibraSun and @Ap15e from
+        -- the micasaverde.com forums for providing various pointers to alternative
+        -- Weather services.
+        --
+        debug("refreshCache called")
+        --
+        -- The last parameter is temporary, can be removed in later builds once bug fix
+        -- is in place (http://forums.micasaverde.com/index.php?topic=1608.0)
+        -- Schedule this "up front" to avoid problems should any of the following
+        -- code have a one-off failure (instead of using a pcall()).  Thanks to @mtf
+        -- for the simple suggestion.
+        --
+        -- Default the refresh period to 5 minutes, but read it's value from the
+        -- "Period" variable.  If some numb-nut sets it to a value lt 10, then save
+        -- them from themselves by using the default...
+        --
+        local period = luup.variable_get(UPS_SERVICE, "Period", PARENT_DEVICE)
+        period = tonumber(period)
+
+        if (period == nil or (period ~= 0 and period &lt; 10) or period > 3600) then
+            period = 300
+        end
+
+        --
+        -- Resubmit the refreshCache job, unless the period==0 (disabled/manual)
+        --
+        if (period ~=0) then
+            luup.call_timer("refreshCache", 1, tostring(period), "")
+        end
+
+        
+        local url = luup.variable_get(UPS_SERVICE, "URL", PARENT_DEVICE)
+        local status, result = fetchSensorData(url)
+
+        if (status) then
+			debug("refreshCache: Successful execution of URL")
+			
+			local changed = false
+			
+			local nompower = luup.variable_get(UPS_SERVICE, "NominalWattage", PARENT_DEVICE) or 0
+			
+			if(result["NOMPOWER"] ~= nil) then
+				nompower = tonumber(result["NOMPOWER"]:match("^([%d%.]+)"))
+				changed = setIfChanged(UPS_SERVICE, "NominalWattage", nompower, PARENT_DEVICE, changed)
+			end
+			
+			if(result["STATUS"] ~= nil) then
+				changed = setIfChanged(UPS_SERVICE, "OnBattery",
+					((result["STATUS"] == "ONBATT") and "1" or "0"), PARENT_DEVICE, changed)
+			end
+			
+			if(result["LOADPCT"] ~= nil) then
+				local loadpct = tonumber(result["LOADPCT"]:match("^([%d%.]+)"))
+				local currwatts = (loadpct / 100) * nompower
+				changed = setIfChanged(ENERGY_METERING_SERVICE, "Watts", round(currwatts), PARENT_DEVICE, changed)
+			end
+			
+			if(result["BCHARGE"] ~= nil) then
+				nompower = tonumber(result["BCHARGE"]:match("^([%d%.]+)"))
+				changed = setIfChanged(HADEVICE_SERVICE, "BatteryLevel", nompower, PARENT_DEVICE, changed)
+				changed = setIfChanged(HADEVICE_SERVICE, "BatteryDate", os.time(), PARENT_DEVICE, changed)
+			end
+          
+			if (changed) then
+				-- Store the current timestamp
+				changed = setIfChanged(HADEVICE_SERVICE, "LastUpdate", os.time(), PARENT_DEVICE, changed)
+			end
+		  
+        else
+			log("fetchSensorData returned error=" .. result)
+        end
+    end
+
+    function startupDeferred()
+        local key = luup.variable_get(UPS_SERVICE, "URL", PARENT_DEVICE)
+        if (key == nil or key == "") then
+            --
+            -- Set the variable so that it appears in the Device/Advanced list
+            --
+            luup.variable_set(UPS_SERVICE, "URL", "", PARENT_DEVICE)
+
+            local msg = "Data URL is required"
+            task(msg, TASK_ERROR_PERM)
+            return
+        end
+
+        refreshCache()
+    end
+
+    function startup(parentDevice)
+
+        log("#" .. tostring(parentDevice) .. " starting up with id " .. luup.devices[parentDevice].id)
+
+        --
+        -- Note these are "pass-by-Global" values that refreshCache will later use.
+        -- I need a var-args version of luup.call_timer(...) to pass these in a
+        -- cleaner manner.
+        --
+
+        PARENT_DEVICE = parentDevice
+        
+        --
+        -- Handle all potential values received for a boolean-type UPnP Variable, and
+        -- convert them to their "strongly recommended" values of "0" or "1".
+        --
+        local onbatt = luup.variable_get(UPS_SERVICE, "OnBattery", parentDevice)
+        if (onbatt == "0" or onbatt == "1") then
+            -- Do nothing, value is correct
+        elseif ((onbatt == "true") or (onbatt == "yes")) then
+            luup.variable_set(UPS_SERVICE, "OnBattery", "1", parentDevice)
+        elseif ((onbatt == nil) or (onbatt == "false") or (onbatt == "no")) then
+            luup.variable_set(UPS_SERVICE, "OnBattery", "0", parentDevice)
+        else 
+            -- For all other values, silently default to Metric, to make it idiot proof. 
+            luup.variable_set(UPS_SERVICE, "OnBattery", "1", parentDevice)
+            debug("OnBattery parameter silently converted to 1, oldValue=" .. onbatt)
+        end
+
+        --
+        -- Do this deferred to avoid slowing down startup processes.
+        --
+        luup.call_timer("startupDeferred", 1, "1", "")
+    end
+  </functions>
+  <incoming>
+      debug("Incoming, really?")
+  </incoming>
+  <startup>startup</startup>
+  <actionList>
+    <action>
+      <serviceId>urn:upnp-zyrenth-com:serviceId:Ups1</serviceId>
+      <name>SetNominalWattage</name>
+      <run>
+        luup.variable_set(UPS_SERVICE, "NominalWattage", lul_settings.wattage or "", lul_device)
+        luup.call_timer("refreshCache", 1, "1", "")
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-zyrenth-com:serviceId:Ups1</serviceId>
+      <name>SetURL</name>
+      <run>
+        luup.variable_set(UPS_SERVICE, "URL", lul_settings.url or "", lul_device)
+        luup.call_timer("refreshCache", 1, "1", "")
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-zyrenth-com:serviceId:Ups1</serviceId>
+      <name>SetPeriod</name>
+      <run>
+        luup.variable_set(UPS_SERVICE, "Period", lul_settings.period or "", lul_device)
+        luup.call_timer("refreshCache", 1, "1", "")
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:micasaverde-com:serviceId:HaDevice1</serviceId>
+      <name>Poll</name>
+      <run>
+        -- Force refreshCache to get called in a Timer
+        luup.call_timer("refreshCache", 1, "1", "")
+      </run>
+    </action>
+    </actionList>
+</implementation>
