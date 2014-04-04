@@ -8,7 +8,7 @@
     <stateVariable sendEvents="no">
       <name>URL</name>
       <dataType>string</dataType>
-      <defaultValue>Enter the URL to the generic temperature JSON</defaultValue>
+      <defaultValue>Enter the URL to for the APC stats CGI</defaultValue>
     </stateVariable>
     <stateVariable sendEvents="no">
       <name>Period</name>
@@ -26,6 +26,14 @@
     </stateVariable>
     <stateVariable sendEvents="no">
       <name>NominalWattage</name>
+      <dataType>ui4</dataType>
+    </stateVariable>
+    <stateVariable sendEvents="yes">
+      <name>LineVoltage</name>
+      <dataType>ui4</dataType>
+    </stateVariable>
+    <stateVariable sendEvents="yes">
+      <name>TimeRemaining</name>
       <dataType>ui4</dataType>
     </stateVariable>
   </serviceStateTable>

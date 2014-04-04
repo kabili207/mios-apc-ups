@@ -198,6 +198,16 @@
 				changed = setIfChanged(UPS_SERVICE, "NominalWattage", nompower, PARENT_DEVICE, changed)
 			end
 			
+			if(result["LINEV"] ~= nil) then
+				local linev = tonumber(result["LINEV"]:match("^([%d%.]+)"))
+				changed = setIfChanged(UPS_SERVICE, "LineVoltage", linev, PARENT_DEVICE, changed)
+			end
+			
+			if(result["TIMELEFT"] ~= nil) then
+				local timeleft = tonumber(result["TIMELEFT"]:match("^([%d%.]+)"))
+				changed = setIfChanged(UPS_SERVICE, "TimeRemaining", timeleft, PARENT_DEVICE, changed)
+			end
+			
 			if(result["STATUS"] ~= nil) then
 				changed = setIfChanged(UPS_SERVICE, "OnBattery",
 					((result["STATUS"] == "ONBATT") and "1" or "0"), PARENT_DEVICE, changed)
@@ -257,17 +267,17 @@
         -- Handle all potential values received for a boolean-type UPnP Variable, and
         -- convert them to their "strongly recommended" values of "0" or "1".
         --
-        local onbatt = luup.variable_get(UPS_SERVICE, "OnBattery", parentDevice)
-        if (onbatt == "0" or onbatt == "1") then
+        local metric = luup.variable_get(UPS_SERVICE, "OnBattery", parentDevice)
+        if (metric == "0" or metric == "1") then
             -- Do nothing, value is correct
-        elseif ((onbatt == "true") or (onbatt == "yes")) then
+        elseif ((metric == "true") or (metric == "yes")) then
             luup.variable_set(UPS_SERVICE, "OnBattery", "1", parentDevice)
-        elseif ((onbatt == nil) or (onbatt == "false") or (onbatt == "no")) then
+        elseif ((metric == nil) or (metric == "false") or (metric == "no")) then
             luup.variable_set(UPS_SERVICE, "OnBattery", "0", parentDevice)
         else 
             -- For all other values, silently default to Metric, to make it idiot proof. 
             luup.variable_set(UPS_SERVICE, "OnBattery", "1", parentDevice)
-            debug("OnBattery parameter silently converted to 1, oldValue=" .. onbatt)
+            debug("OnBattery parameter silently converted to 1, oldValue=" .. metric)
         end
 
         --
