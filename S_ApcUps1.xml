@@ -36,6 +36,10 @@
       <name>TimeRemaining</name>
       <dataType>ui4</dataType>
     </stateVariable>
+    <stateVariable sendEvents="yes">
+      <name>BatteryVoltage</name>
+      <dataType>ui4</dataType>
+    </stateVariable>
   </serviceStateTable>
   <actionList>
     <action>

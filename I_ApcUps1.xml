@@ -203,6 +203,11 @@
 				changed = setIfChanged(UPS_SERVICE, "LineVoltage", linev, PARENT_DEVICE, changed)
 			end
 			
+			if(result["BATTV"] ~= nil) then
+				local battv = tonumber(result["BATTV"]:match("^([%d%.]+)"))
+				changed = setIfChanged(UPS_SERVICE, "BatteryVoltage", battv, PARENT_DEVICE, changed)
+			end
+			
 			if(result["TIMELEFT"] ~= nil) then
 				local timeleft = tonumber(result["TIMELEFT"]:match("^([%d%.]+)"))
 				changed = setIfChanged(UPS_SERVICE, "TimeRemaining", timeleft, PARENT_DEVICE, changed)

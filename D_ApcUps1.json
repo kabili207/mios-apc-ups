@@ -300,6 +300,34 @@
             "Function": "advanced_device"
         }
     ],
+	"eventList": {
+		"event_1": {
+			"label": "Battery level goes below",
+			"serviceId": "urn:micasaverde-com:serviceId:HaDevice1",
+			"argumentList": {
+				"argument_1": {
+					"prefix":"Level",
+					"dataType": "ui4",
+					"name": "BatteryLevel",
+					"comparisson": "<",
+					"suffix": "%" 
+				} 
+			} 
+		},
+		"event_2": {
+			"label": "Remaining battery time reached",
+			"serviceId": "urn:upnp-zyrenth-com:serviceId:Ups1",
+			"argumentList": {
+				"argument_1": {
+					"dataType": "ui4",
+					"name": "TimeRemaining",
+					"comparisson": "<,>",
+					"prefix": "Remaining",
+					"suffix": "Minutes" 
+				} 
+			} 
+		}
+	},
     "DeviceType": "urn:zyrenth-com:device:Ups:1",
     
 }
