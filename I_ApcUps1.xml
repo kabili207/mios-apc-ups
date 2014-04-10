@@ -216,6 +216,7 @@
 			if(result["STATUS"] ~= nil) then
 				changed = setIfChanged(UPS_SERVICE, "OnBattery",
 					((result["STATUS"] == "ONBATT") and "1" or "0"), PARENT_DEVICE, changed)
+				changed = setIfChanged(UPS_SERVICE, "Status", result["STATUS"], PARENT_DEVICE, changed)
 			end
 			
 			if(result["LOADPCT"] ~= nil) then

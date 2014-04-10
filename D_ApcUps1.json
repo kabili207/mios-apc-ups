@@ -20,8 +20,8 @@
     "Tabs": [
         {
             "Label": {
-                "lang_tag": "tabname_control",
-                "text": "Settings"
+                "lang_tag": "tab_control",
+                "text": "Status"
             },
             "Position": "0",
             "TabType": "flash",
@@ -31,7 +31,21 @@
                     "top": "0.5",
                     "left": "0",
                     "x": "2",
-                    "y": "3"
+                    "y": "1"
+                },
+                {
+                    "id": "2",
+                    "top": "1.5",
+                    "left": "0",
+                    "x": "2",
+                    "y": "1"
+                },
+                {
+                    "id": "3",
+                    "top": "2.5",
+                    "left": "0",
+                    "x": "2",
+                    "y": "1"
                 }
             ],
             "ControlGroup": [
@@ -40,21 +54,127 @@
                     "type": "info",
                     "scenegroup": "1"
                 },
-				{
-					"id": "2",
-					"type": "info",
-					"scenegroup": "1"
-				}
+                {
+                    "id": "2",
+                    "type": "info",
+                    "scenegroup": "2"
+                },
+                {
+                    "id": "3",
+                    "type": "info",
+                    "scenegroup": "3"
+                }
             ],
             "Control": [
                 {
+                    "ControlGroup": "1",
                     "ControlType": "label",
                     "Label": {
-                        "lang_tag": "device_settings_page",
+                        "lang_tag": "line_voltage",
+                        "text": "Line Voltage"
+                    },
+                    "top": "0",
+                    "left": "0",
+                    "Display": {
+                        "Top": 20,
+                        "Left": 50,
+                        "Width": 120,
+                        "Height": 20
+                    }
+                },
+                {
+                    "ControlGroup": "1",
+                    "ControlType": "variable",
+                    "top": "0",
+                    "left": "1",
+                    "Display": {
+                        "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
+                        "Variable": "LineVoltage",
+                        "Top": 40,
+                        "Left": 50,
+                        "Width": 120,
+                        "Height": 20
+                    }
+                },
+                {
+                    "ControlGroup": "2",
+                    "ControlType": "label",
+                    "Label": {
+                        "lang_tag": "battery_voltage",
+                        "text": "Battery Voltage"
+                    },
+                    "top": "0",
+                    "left": "0",
+                    "Display": {
+                        "Top": 20,
+                        "Left": 150,
+                        "Width": 120,
+                        "Height": 20
+                    }
+                },
+                {
+                    "ControlGroup": "2",
+                    "ControlType": "variable",
+                    "top": "0",
+                    "left": "1",
+                    "Display": {
+                        "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
+                        "Variable": "BatteryVoltage",
+                        "Top": 40,
+                        "Left": 150,
+                        "Width": 120,
+                        "Height": 20
+                    }
+                },
+                {
+                    "ControlGroup": "3",
+                    "ControlType": "label",
+                    "Label": {
+                        "lang_tag": "time_left",
+                        "text": "Time Left"
+                    },
+                    "top": "0",
+                    "left": "0",
+                    "Display": {
+                        "Top": 20,
+                        "Left": 250,
+                        "Width": 120,
+                        "Height": 20
+                    }
+                },
+                {
+                    "ControlGroup": "3",
+                    "ControlType": "variable",
+                    "top": "0",
+                    "left": "1",
+                    "Display": {
+                        "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
+                        "Variable": "TimeRemaining",
+                        "Top": 40,
+                        "Left": 250,
+                        "Width": 120,
+                        "Height": 20
+                    }
+                }
+                
+            ]
+        },
+		{
+            "Label": {
+                "lang_tag": "tab_settings",
+                "text": "Settings"
+            },
+            "Position": "1",
+            "TabType": "flash",
+            "Control": [ {},{},{},{},{},{},
+                {
+                    "ControlType": "label",
+                    "Label": {
+                        "lang_tag": "url_tag",
                         "text": "URL"
                     },
                     "Display": {
-                        "Top": 60,
+                        "Top": 10,
                         "Left": 50,
                         "Width": 120,
                         "Height": 20
@@ -65,7 +185,7 @@
                     "Display": {
                         "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
                         "Variable": "URL",
-                        "Top": 60,
+                        "Top": 10,
                         "Left": 90,
                         "Width": 100,
                         "Height": 20
@@ -75,7 +195,7 @@
                     "ControlType": "input",
                     "ID": "URL",
                     "Display": {
-                        "Top": 78,
+                        "Top": 28,
                         "Left": 50,
                         "Width": 250,
                         "Height": 20
@@ -88,7 +208,7 @@
                         "text": "Set"
                     },
                     "Display": {
-                        "Top": 76,
+                        "Top": 26,
                         "Left": 330,
                         "Width": 50,
                         "Height": 20
@@ -107,11 +227,11 @@
                 {
                     "ControlType": "label",
                     "Label": {
-                        "lang_tag": "device_settings_page",
+                        "lang_tag": "polling_override",
                         "text": "Polling (Override (s)) - "
                     },
                     "Display": {
-                        "Top": 105,
+                        "Top": 55,
                         "Left": 50,
                         "Width": 120,
                         "Height": 20
@@ -122,7 +242,7 @@
                     "Display": {
                         "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
                         "Variable": "Period",
-                        "Top": 105,
+                        "Top": 55,
                         "Left": 210,
                         "Width": 100,
                         "Height": 20
@@ -132,7 +252,7 @@
                     "ControlType": "input",
                     "ID": "Period",
                     "Display": {
-                        "Top": 121,
+                        "Top": 71,
                         "Left": 50,
                         "Width": 100,
                         "Height": 20
@@ -140,12 +260,13 @@
                 },
                 {
                     "ControlType": "button",
+                    "ControlGroup": "2",
                     "Label": {
                         "lang_tag": "cmd_set",
                         "text": "Set"
                     },
                     "Display": {
-                        "Top": 119,
+                        "Top": 69,
                         "Left": 180,
                         "Width": 50,
                         "Height": 20
@@ -164,11 +285,11 @@
                 {
                     "ControlType": "label",
                     "Label": {
-                        "lang_tag": "device_settings_page",
+                        "lang_tag": "nominal_wattage",
                         "text": "Nominal Wattage (if not supported by UPS) - "
                     },
                     "Display": {
-                        "Top": 150,
+                        "Top": 100,
                         "Left": 50,
                         "Width": 120,
                         "Height": 20
@@ -179,7 +300,7 @@
                     "Display": {
                         "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
                         "Variable": "NominalWattage",
-                        "Top": 150,
+                        "Top": 100,
                         "Left": 310,
                         "Width": 100,
                         "Height": 20
@@ -189,7 +310,7 @@
                     "ControlType": "input",
                     "ID": "NominalWattage",
                     "Display": {
-                        "Top": 167,
+                        "Top": 117,
                         "Left": 50,
                         "Width": 100,
                         "Height": 20
@@ -202,7 +323,7 @@
                         "text": "Set"
                     },
                     "Display": {
-                        "Top": 164,
+                        "Top": 114,
                         "Left": 180,
                         "Width": 50,
                         "Height": 20
@@ -217,76 +338,7 @@
                             }
                         ]
                     }
-                },
-                {
-                    "ControlGroup": "2",
-                    "ControlPair": "2",
-                    "ControlHeader": "1",
-                    "ControlType": "label",
-                    "Label": {
-                        "lang_tag": "device_settings_page",
-                        "text": "Line Voltage"
-                    },
-                    "top": "1",
-                    "left": "0",
-                    "Display": {
-                        "Top": 220,
-                        "Left": 50,
-                        "Width": 120,
-                        "Height": 20
-                    }
-                },
-                {
-                    "ControlGroup": "2",
-                    "ControlPair": "2",
-                    "ControlHeader": "1",
-                    "ControlType": "variable",
-                    "top": "1",
-                    "left": "1",
-                    "Display": {
-                        "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
-                        "Variable": "LineVoltage",
-                        "Top": 240,
-                        "Left": 50,
-                        "Width": 120,
-                        "Height": 20
-                    }
-                },
-                {
-                    "ControlGroup": "2",
-                    "ControlPair": "2",
-                    "ControlHeader": "1",
-                    "ControlType": "label",
-                    "Label": {
-                        "lang_tag": "device_settings_page",
-                        "text": "Time Left"
-                    },
-                    "top": "2",
-                    "left": "0",
-                    "Display": {
-                        "Top": 260,
-                        "Left": 50,
-                        "Width": 120,
-                        "Height": 20
-                    }
-                },
-                {
-                    "ControlGroup": "2",
-                    "ControlPair": "2",
-                    "ControlHeader": "1",
-                    "ControlType": "variable",
-                    "top": "2",
-                    "left": "1",
-                    "Display": {
-                        "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
-                        "Variable": "TimeRemaining",
-                        "Top": 280,
-                        "Left": 50,
-                        "Width": 120,
-                        "Height": 20
-                    }
                 }
-                
             ]
         },
         {
@@ -298,36 +350,131 @@
             "TabType": "javascript",
             "ScriptName": "shared.js",
             "Function": "advanced_device"
+        },
+        {
+            "Label": {
+                "lang_tag": "logs",
+                "text": "Logs" 
+            },
+            "Position": "3",
+            "TabType": "javascript",
+            "ScriptName": "shared.js",
+            "Function": "device_logs" 
+        },
+        {
+            "Label": {
+                "lang_tag": "notifications",
+                "text": "Notifications" 
+            },
+            "Position": "4",
+            "TabType": "javascript",
+            "ScriptName": "shared.js",
+            "Function": "device_notifications" 
         }
     ],
-	"eventList": {
-		"event_1": {
-			"label": "Battery level goes below",
+	"eventList2": [
+		{
+			"id": 1,
+			"label": {
+				"lang_tag": "battery_level_goes_below",
+				"text": "Battery level goes below"
+			},
 			"serviceId": "urn:micasaverde-com:serviceId:HaDevice1",
-			"argumentList": {
-				"argument_1": {
-					"prefix":"Level",
+			"argumentList": [
+				{
+					"id": 1,
 					"dataType": "ui4",
 					"name": "BatteryLevel",
 					"comparisson": "<",
-					"suffix": "%" 
-				} 
-			} 
+					"prefix": {
+						"lang_tag": "battery_level",
+						"text": "Battery Level"
+					},
+					"suffix": {
+						"lang_tag": "percent",
+						"text": "%"
+					},
+					"HumanFriendlyText": {
+						"lang_tag": "hft_battery_level_goes_below",
+						"text": "_DEVICE_NAME_: Battery level goes below _ARGUMENT_VALUE_ percent"
+					}
+				}
+			]
 		},
-		"event_2": {
-			"label": "Remaining battery time reached",
+		{
+			"id": 2,
+			"label": {
+				"lang_tag": "remaining_time_goes_below",
+				"text": "Remaining time goes below"
+			},
 			"serviceId": "urn:upnp-zyrenth-com:serviceId:Ups1",
-			"argumentList": {
-				"argument_1": {
+			"argumentList": [
+				{
+					"id": 1,
 					"dataType": "ui4",
 					"name": "TimeRemaining",
-					"comparisson": "<,>",
-					"prefix": "Remaining",
-					"suffix": "Minutes" 
-				} 
-			} 
+					"comparisson": "<",
+					"prefix": {
+						"lang_tag": "time_remaining",
+						"text": "Time Remaining"
+					},
+					"suffix": {
+						"lang_tag": "minutes",
+						"text": "minutes"
+					},
+					"HumanFriendlyText": {
+						"lang_tag": "hft_battery_level_goes_below",
+						"text": "_DEVICE_NAME_: Less than _ARGUMENT_VALUE_ minutes remaining"
+					}
+				}
+			]
+		},
+		{
+			"id": 3,
+			"label": {
+				"lang_tag": "status_changes",
+				"text": "Status changes"
+			},
+			"serviceId": "urn:upnp-zyrenth-com:serviceId:Ups1",
+			"argumentList": [
+				{
+					"id": 1,
+					"dataType": "string",
+					"name": "Status",
+					"comparisson": "=",
+					"prefix": {
+						"lang_tag": "status",
+						"text": "Status"
+					},
+					"suffix": {},
+					"allowedValueList": [
+						{
+							"value": "ONLINE",
+							"HumanFriendlyText": {
+								"lang_tag": "hft_status_on_line",
+								"text": "_DEVICE_NAME_: UPS is running on line power"
+							}
+						},
+						{
+							"value": "ONBATT",
+							"HumanFriendlyText": {
+								"lang_tag": "hft_status_on_battery",
+								"text": "_DEVICE_NAME_: UPS is running on battery power"
+							}
+						},
+						{
+							"value": "CHARGING",
+							"HumanFriendlyText": {
+								"lang_tag": "hft_status_charging",
+								"text": "_DEVICE_NAME_: UPS is charging the battery"
+							}
+						}
+					]
+					
+				}
+			]
 		}
-	},
-    "DeviceType": "urn:zyrenth-com:device:Ups:1",
+	],
+    "DeviceType": "urn:zyrenth-com:device:Ups:1"
     
 }

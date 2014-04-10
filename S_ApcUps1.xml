@@ -40,6 +40,10 @@
       <name>BatteryVoltage</name>
       <dataType>ui4</dataType>
     </stateVariable>
+    <stateVariable sendEvents="yes">
+      <name>Status</name>
+      <dataType>string</dataType>
+    </stateVariable>
   </serviceStateTable>
   <actionList>
     <action>
