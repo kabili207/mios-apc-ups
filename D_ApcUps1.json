@@ -28,21 +28,28 @@
             "SceneGroup": [
                 {
                     "id": "1",
-                    "top": "0.5",
+                    "top": "0.25",
                     "left": "0",
                     "x": "2",
                     "y": "1"
                 },
                 {
                     "id": "2",
-                    "top": "1.5",
+                    "top": "1.25",
                     "left": "0",
                     "x": "2",
                     "y": "1"
                 },
                 {
                     "id": "3",
-                    "top": "2.5",
+                    "top": "2.25",
+                    "left": "0",
+                    "x": "2",
+                    "y": "1"
+                },
+                {
+                    "id": "4",
+                    "top": "3.25",
                     "left": "0",
                     "x": "2",
                     "y": "1"
@@ -63,6 +70,11 @@
                     "id": "3",
                     "type": "info",
                     "scenegroup": "3"
+                },
+                {
+                    "id": "4",
+                    "type": "info",
+                    "scenegroup": "4"
                 }
             ],
             "Control": [
@@ -70,11 +82,12 @@
                     "ControlGroup": "1",
                     "ControlType": "label",
                     "Label": {
-                        "lang_tag": "line_voltage",
-                        "text": "Line Voltage"
+                        "lang_tag": "status",
+                        "text": "Status"
                     },
                     "top": "0",
                     "left": "0",
+					"x": "1.5",
                     "Display": {
                         "Top": 20,
                         "Left": 50,
@@ -87,6 +100,38 @@
                     "ControlType": "variable",
                     "top": "0",
                     "left": "1",
+                    "Display": {
+                        "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
+                        "Variable": "Status",
+                        "Top": 40,
+                        "Left": 50,
+                        "Width": 120,
+                        "Height": 20
+                    }
+                },
+                {
+                    "ControlGroup": "2",
+                    "ControlType": "label",
+                    "Label": {
+                        "lang_tag": "line_voltage",
+                        "text": "Line Voltage"
+                    },
+                    "top": "0",
+                    "left": "0",
+					"x": "1.5",
+                    "Display": {
+                        "Top": 20,
+                        "Left": 50,
+                        "Width": 120,
+                        "Height": 20
+                    }
+                },
+                {
+                    "ControlGroup": "2",
+                    "ControlType": "variable",
+                    "top": "0",
+                    "left": "1.5",
+					"x": "0.5",
                     "Display": {
                         "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
                         "Variable": "LineVoltage",
@@ -97,7 +142,7 @@
                     }
                 },
                 {
-                    "ControlGroup": "2",
+                    "ControlGroup": "3",
                     "ControlType": "label",
                     "Label": {
                         "lang_tag": "battery_voltage",
@@ -105,6 +150,7 @@
                     },
                     "top": "0",
                     "left": "0",
+					"x": "1.5",
                     "Display": {
                         "Top": 20,
                         "Left": 150,
@@ -113,10 +159,11 @@
                     }
                 },
                 {
-                    "ControlGroup": "2",
+                    "ControlGroup": "3",
                     "ControlType": "variable",
                     "top": "0",
-                    "left": "1",
+                    "left": "1.5",
+					"x": "0.5",
                     "Display": {
                         "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
                         "Variable": "BatteryVoltage",
@@ -127,7 +174,7 @@
                     }
                 },
                 {
-                    "ControlGroup": "3",
+                    "ControlGroup": "4",
                     "ControlType": "label",
                     "Label": {
                         "lang_tag": "time_left",
@@ -135,6 +182,7 @@
                     },
                     "top": "0",
                     "left": "0",
+					"x": "1.5",
                     "Display": {
                         "Top": 20,
                         "Left": 250,
@@ -143,10 +191,11 @@
                     }
                 },
                 {
-                    "ControlGroup": "3",
+                    "ControlGroup": "4",
                     "ControlType": "variable",
                     "top": "0",
-                    "left": "1",
+                    "left": "1.5",
+					"x": "0.5",
                     "Display": {
                         "Service": "urn:upnp-zyrenth-com:serviceId:Ups1",
                         "Variable": "TimeRemaining",
